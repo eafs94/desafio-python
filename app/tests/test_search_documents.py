@@ -7,7 +7,7 @@ def test_search_documents_found(client):
         "data": "2025-01-01"
     })
 
-    response = client.get("/documentos?palavraChave=informa")
+    response = client.get("/documentos?palavraChave=Informação")
     assert response.status_code == 200
 
     results = response.json()

@@ -1,17 +1,18 @@
 # **Microsserviço de Busca de Documentos**
 
-Este projeto implementa um microsserviço em **Python + FastAPI** para criação e busca de documentos a partir de uma palavra-chave, conforme a especificação do desafio técnico.
-O foco é uma solução simples, organizada, funcional e fácil de manter.
+Este projeto implementa um microsserviço em **Python + FastAPI** para criação e busca de documentos, conforme a especificação do desafio técnico.
+
+O objetivo é entregar uma solução **simples**, **organizada**, **testada** e **de fácil manutenção**, seguindo boas práticas de arquitetura.
 
 ---
 
-## **🔧 Tecnologias utilizadas**
+## **Tecnologias utilizadas**
 
-* **FastAPI** (API REST simples e performática)
-* **SQLite + SQLAlchemy** (banco leve, persistente e com ORM)
-* **Pydantic** (validação de dados)
-* **Pytest** (testes automatizados)
-* **Logging nativo do Python**
+* **FastAPI** – API REST leve, moderna e performática
+* **SQLite + SQLAlchemy** – banco local persistente e ORM robusto
+* **Pydantic** – validação e serialização de dados
+* **Pytest** – testes automatizados
+* **Logging nativo do Python** – rastreamento de operações e erros
 
 ---
 
@@ -22,13 +23,13 @@ Organizado em camadas para facilitar manutenção e clareza:
 ```
 app/
  ├── api/               → rotas da API (FastAPI Router)
- ├── core/              → banco de dados e configurações gerais
+ ├── core/              → banco de dados e configurações
  ├── models/            → modelos SQLAlchemy (tabelas)
  ├── repositories/      → camada de acesso ao banco (CRUD)
- ├── schemas/           → validações e contratos Pydantic
+ ├── schemas/           → contratos e validações Pydantic
  ├── services/          → regras de negócio
- ├── utils/             → utilitários e logger
- ├── tests/             → testes unitários (pytest)
+ ├── utils/             → utilitários (logger, cálculo de distância)
+ ├── tests/             → testes unitários com pytest
  └── main.py            → ponto de entrada da aplicação
 ```
 
@@ -68,7 +69,8 @@ Os testes cobrem:
 
 * criação de documento
 * busca por palavra-chave
-* cenários de erro para entradas inválidas
+* validação de erros
+* fluxo completo dos endpoints principais
 
 ---
 
@@ -85,7 +87,9 @@ Exemplo:
     "titulo": "Meu Documento",
     "autor": "Eric",
     "conteudo": "Texto simples",
-    "data": "2025-01-01"
+    "data": "2025-01-01",
+    "latitude": -30.03,
+    "longitude": -51.23
 }
 ```
 
@@ -95,32 +99,52 @@ Retorno: **201 CREATED**
 
 ### **2. Buscar documentos por palavra-chave**
 
-`GET /documentos?palavraChave=info`
+`GET /documentos`
+
+Parâmetros disponíveis:
+
+| Parâmetro      | Tipo   | Descrição                                        |
+| -------------- | ------ | ------------------------------------------------ |
+| `palavraChave` | string | Busca tradicional por palavra-chave              |
+| `busca`        | string | **Busca por frase completa (bônus)**             |
+| `latitude`     | float  | **Ordenação por proximidade geográfica (bônus)** |
+| `longitude`    | float  | **Ordenação por proximidade geográfica (bônus)** |
+
+---
+
+### **2.1. Busca por palavra-chave**
+
+```
+GET /documentos?palavraChave=informação
+```
+
+Retorno:
+
+* lista com documentos encontrados
+* lista vazia se não encontrar
+* erro 400 se palavra estiver vazia
+
+---
+
+### **2.2. Busca por frase (bônus)**
+
+```
+GET /documentos?busca=informações importantes sobre a cidade
+```
+
+A busca por frase verifica a ocorrência da frase completa no título, autor ou conteúdo.
+
+---
+
+### **2.3. Ordenação por geolocalização (bônus)**
+
+Se latitude + longitude forem enviados, o resultado é ordenado automaticamente pela distância do ponto informado.
 
 Exemplo:
 
 ```
-GET /documentos?palavraChave=Informação
+GET /documentos?palavraChave=cidade&latitude=-30.03&longitude=-51.23
 ```
-
-Exemplo de retorno:
-
-```json
-[
-  {
-    "id": 1,
-    "titulo": "Era da Informação",
-    "autor": "Autor X",
-    "conteudo": "Informação importante",
-    "data": "2025-01-01"
-  }
-]
-```
-
-Regras:
-
-* palavra inexistente → lista vazia
-* palavra vazia → erro 400
 
 ---
 
@@ -130,9 +154,10 @@ A aplicação registra:
 
 * criação de documentos
 * buscas realizadas
-* erros de validação
+* exceções e validações
+* operações de ordenação geográfica
 
-Os logs utilizam `logging` do Python e são gerenciados pelo utilitário `utils/logger.py`.
+Os logs utilizam `logging` do Python via `utils/logger.py`.
 
 ---
 
@@ -148,5 +173,7 @@ Os logs utilizam `logging` do Python e são gerenciados pelo utilitário `utils/
 
 ## **Observações**
 
-* O escopo principal foi implementado conforme solicitado.
-* A estrutura está preparada para possíveis expansões (ex.: ordenação por geolocalização e busca por frase).
+* A busca por frase utiliza comparação “contém” (`LIKE "%frase%"`).
+* A busca por palavra-chave mantém o comportamento mais restritivo definido inicialmente.
+* Latitude/longitude são opcionais e utilizadas apenas para ordenação.
+* A aplicação está pronta para expansão futura caso necessário.
