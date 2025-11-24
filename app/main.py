@@ -1,4 +1,8 @@
 from fastapi import FastAPI
+from app.core.database import Base, engine
+
+# Cria as tabelas (somente se não existirem)
+Base.metadata.create_all(bind=engine)
 
 # Instância principal da aplicação
 app = FastAPI(
