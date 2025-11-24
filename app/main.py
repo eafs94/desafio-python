@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from app.core.database import Base, engine
+from app.api.documentos_router import router as documentos_router
 
 # Cria as tabelas (somente se não existirem)
 Base.metadata.create_all(bind=engine)
@@ -10,6 +11,8 @@ app = FastAPI(
     version="1.0.0",
     description="Microsserviço para criação e busca de documentos por palavra-chave."
 )
+
+app.include_router(documentos_router)
 
 @app.get("/")
 def root():
