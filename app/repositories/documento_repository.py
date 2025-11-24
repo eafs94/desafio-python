@@ -31,7 +31,15 @@ class DocumentoRepository:
     def buscar_por_palavra_chave(db: Session, palavra: str) -> list[Documento]:
         logger.info(f"Executando busca no repositorio pela palavra-chave: '{palavra}'")
         stmt = select(Documento).where(
-            Documento.conteudo.ilike(f"%{palavra}%")
+            Documento.titulo.ilike(f"{palavra} %") |
+            Documento.titulo.ilike(f"% {palavra} %") |
+            Documento.titulo.ilike(f"% {palavra}") |
+            Documento.autor.ilike(f"{palavra} %") |
+            Documento.autor.ilike(f"% {palavra} %") |
+            Documento.autor.ilike(f"% {palavra}") |
+            Documento.conteudo.ilike(f"{palavra} %") |
+            Documento.conteudo.ilike(f"% {palavra} %") |
+            Documento.conteudo.ilike(f"% {palavra}")
         )
         resultados = db.scalars(stmt).all()
         logger.info(f"Busca no repositorio retornou {len(resultados)} resultado(s) para palavra='{palavra}'")
