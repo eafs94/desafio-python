@@ -1,6 +1,6 @@
 # **Microsserviço de Busca de Documentos**
 
-Este projeto implementa um microsserviço em **Python + FastAPI** para criação e busca de documentos a partir de uma palavra-chave, conforme especificação do desafio técnico.
+Este projeto implementa um microsserviço em **Python + FastAPI** para criação e busca de documentos a partir de uma palavra-chave, conforme a especificação do desafio técnico.
 O foco é uma solução simples, organizada, funcional e fácil de manter.
 
 ---
@@ -8,7 +8,7 @@ O foco é uma solução simples, organizada, funcional e fácil de manter.
 ## **🔧 Tecnologias utilizadas**
 
 * **FastAPI** (API REST simples e performática)
-* **SQLite + SQLAlchemy** (banco leve, não-volátil e com ORM)
+* **SQLite + SQLAlchemy** (banco leve, persistente e com ORM)
 * **Pydantic** (validação de dados)
 * **Pytest** (testes automatizados)
 * **Logging nativo do Python**
@@ -17,18 +17,19 @@ O foco é uma solução simples, organizada, funcional e fácil de manter.
 
 ## **Arquitetura do projeto**
 
-Organização em camadas para facilitar manutenção:
+Organizado em camadas para facilitar manutenção e clareza:
 
 ```
 app/
- ├── core/           → conexão com banco e configurações
- ├── models/         → modelos SQLAlchemy
- ├── schemas/        → schemas Pydantic
- ├── repositories/   → acesso ao banco
- ├── services/       → regras de negócio
- ├── routers/        → rotas da API
- ├── logs/           → configuração de logs
- └── tests/          → testes unitários
+ ├── api/               → rotas da API (FastAPI Router)
+ ├── core/              → banco de dados e configurações gerais
+ ├── models/            → modelos SQLAlchemy (tabelas)
+ ├── repositories/      → camada de acesso ao banco (CRUD)
+ ├── schemas/           → validações e contratos Pydantic
+ ├── services/          → regras de negócio
+ ├── utils/             → utilitários e logger
+ ├── tests/             → testes unitários (pytest)
+ └── main.py            → ponto de entrada da aplicação
 ```
 
 ---
@@ -59,11 +60,15 @@ http://127.0.0.1:8000/docs
 
 ## **Como executar os testes**
 
-Testes simples cobrindo criação e busca de documentos:
-
 ```
 pytest -q
 ```
+
+Os testes cobrem:
+
+* criação de documento
+* busca por palavra-chave
+* cenários de erro para entradas inválidas
 
 ---
 
@@ -71,9 +76,9 @@ pytest -q
 
 ### **1. Criar documento**
 
-**POST /documentos**
+`POST /documentos`
 
-Exemplo de corpo JSON:
+Exemplo:
 
 ```json
 {
@@ -84,16 +89,13 @@ Exemplo de corpo JSON:
 }
 ```
 
-Retorno esperado:
-201 CREATED com os dados gravados.
+Retorno: **201 CREATED**
 
 ---
 
 ### **2. Buscar documentos por palavra-chave**
 
-**GET /documentos?palavraChave=info**
-
-Retorna lista de documentos cujo título ou conteúdo contenham a palavra informada.
+`GET /documentos?palavraChave=info`
 
 Exemplo:
 
@@ -101,7 +103,7 @@ Exemplo:
 GET /documentos?palavraChave=Informação
 ```
 
-Retorno:
+Exemplo de retorno:
 
 ```json
 [
@@ -115,8 +117,10 @@ Retorno:
 ]
 ```
 
-Para palavra inexistente → retorna lista vazia.
-Para palavra vazia → retorna erro **400**.
+Regras:
+
+* palavra inexistente → lista vazia
+* palavra vazia → erro 400
 
 ---
 
@@ -128,21 +132,21 @@ A aplicação registra:
 * buscas realizadas
 * erros de validação
 
-Os logs utilizam o **logging padrão do Python** e ficam acessíveis no console ou no handler configurado.
+Os logs utilizam `logging` do Python e são gerenciados pelo utilitário `utils/logger.py`.
 
 ---
 
 ## **Decisões Técnicas**
 
-* **FastAPI** → rápido, moderno e oferece documentação automática.
-* **SQLite** → leve, persistente e suficiente para o escopo do desafio.
-* **SQLAlchemy** → ORM consolidado, facilita CRUD e manutenção.
-* **Arquitetura em camadas** → deixa o código limpo, isolado e fácil de evoluir.
-* **Testes automatizados** → garantem que a API funciona e atendem ao critério da banca.
+* **FastAPI** pela simplicidade e documentação automática.
+* **SQLite** por ser leve e suficiente para o escopo do desafio.
+* **SQLAlchemy** para um CRUD mais limpo e organizado.
+* **Arquitetura em camadas** para separar responsabilidades.
+* **Testes automatizados** para garantir funcionamento e cumprir critérios de avaliação.
 
 ---
 
 ## **Observações**
 
-* Apenas o escopo principal foi implementado conforme solicitado.
-* Estrutura preparada para expansão (ex.: ordenação por geolocalização e busca por frases).
+* O escopo principal foi implementado conforme solicitado.
+* A estrutura está preparada para possíveis expansões (ex.: ordenação por geolocalização e busca por frase).
