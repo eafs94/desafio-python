@@ -17,6 +17,22 @@ def criar_documento(documento: DocumentoCreate, db: Session = Depends(get_db)):
 
 
 @router.get("/", response_model=list[DocumentoResponse])
-def buscar_documentos(palavraChave: str, db: Session = Depends(get_db)):
-    logger.info(f"GET /documentos recebido com palavraChave='{palavraChave}'")
-    return DocumentoService.buscar_por_palavra_chave(db, palavraChave)
+def buscar_documentos(
+    palavraChave: str | None = None,
+    busca: str | None = None,
+    latitude: float | None = None,
+    longitude: float | None = None,
+    db: Session = Depends(get_db)
+):
+    logger.info(
+        f"GET /documentos recebido (palavraChave='{palavraChave}', "
+        f"busca='{busca}', latitude='{latitude}', longitude='{longitude}')"
+    )
+
+    return DocumentoService.buscar(
+        db=db,
+        palavra=palavraChave,
+        frase=busca,
+        latitude=latitude,
+        longitude=longitude
+    )

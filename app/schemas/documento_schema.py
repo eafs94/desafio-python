@@ -7,6 +7,8 @@ class DocumentoCreate(BaseModel):
     autor: str
     conteudo: str
     data: date
+    latitude: float | None = None
+    longitude: float | None = None
 
 
 class DocumentoResponse(BaseModel):
@@ -15,6 +17,8 @@ class DocumentoResponse(BaseModel):
     autor: str
     conteudo: str
     data: date
+    latitude: float | None = None
+    longitude: float | None = None
 
     class Config:
         from_attributes = True  # Permite retornar objetos ORM do SQLAlchemy

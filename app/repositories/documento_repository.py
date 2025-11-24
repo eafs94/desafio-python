@@ -17,7 +17,9 @@ class DocumentoRepository:
             titulo=documento.titulo,
             autor=documento.autor,
             conteudo=documento.conteudo,
-            data=documento.data
+            data=documento.data,
+            latitude=documento.latitude,
+            longitude=documento.longitude
         )
         db.add(novo_documento)
         db.commit()
@@ -31,17 +33,31 @@ class DocumentoRepository:
     def buscar_por_palavra_chave(db: Session, palavra: str) -> list[Documento]:
         logger.info(f"Executando busca no repositorio pela palavra-chave: '{palavra}'")
         stmt = select(Documento).where(
-            Documento.titulo.ilike(f"{palavra} %") |
-            Documento.titulo.ilike(f"% {palavra} %") |
-            Documento.titulo.ilike(f"% {palavra}") |
-            Documento.autor.ilike(f"{palavra} %") |
-            Documento.autor.ilike(f"% {palavra} %") |
-            Documento.autor.ilike(f"% {palavra}") |
-            Documento.conteudo.ilike(f"{palavra} %") |
-            Documento.conteudo.ilike(f"% {palavra} %") |
-            Documento.conteudo.ilike(f"% {palavra}")
+            Documento.titulo.ilike(f"{palavra} %")
+            | Documento.titulo.ilike(f"% {palavra} %")
+            | Documento.titulo.ilike(f"% {palavra}")
+            | Documento.autor.ilike(f"{palavra} %")
+            | Documento.autor.ilike(f"% {palavra} %")
+            | Documento.autor.ilike(f"% {palavra}")
+            | Documento.conteudo.ilike(f"{palavra} %")
+            | Documento.conteudo.ilike(f"% {palavra} %")
+            | Documento.conteudo.ilike(f"% {palavra}")
         )
         resultados = db.scalars(stmt).all()
         logger.info(f"Busca no repositorio retornou {len(resultados)} resultado(s) para palavra='{palavra}'")
 
+        return resultados
+
+
+    @staticmethod
+    def buscar_por_frase(db: Session, frase: str) -> list[Documento]:
+        logger.info(f"Executando busca por frase: '{frase}'")
+        stmt = select(Documento).where(
+            Documento.titulo.ilike(f"%{frase}%")
+            | Documento.autor.ilike(f"%{frase}%")
+            | Documento.conteudo.ilike(f"%{frase}%")
+        )
+        resultados = db.scalars(stmt).all()
+        logger.info(f"Busca por frase retornou {len(resultados)} resultado(s)")
+        
         return resultados

@@ -3,6 +3,7 @@ from fastapi import HTTPException, status
 from app.schemas.documento_schema import DocumentoCreate, DocumentoResponse
 from app.repositories.documento_repository import DocumentoRepository
 from app.utils.logger import get_logger
+from app.utils.distance import calcular_distancia
 
 
 logger = get_logger()
@@ -42,3 +43,40 @@ class DocumentoService:
         logger.info(f"[SERVICE] Busca finalizada: {len(documentos)} documento(s) encontrado(s) para '{palavra}'")
 
         return [DocumentoResponse.model_validate(doc) for doc in documentos]
+
+
+    @staticmethod
+    def buscar(db: Session, palavra: str | None, frase: str | None,
+               latitude: float | None, longitude: float | None) -> list[DocumentoResponse]:
+
+        if frase:
+            logger.info(f"[SERVICE] Iniciando busca por frase: '{frase}'")
+            resultados = DocumentoRepository.buscar_por_frase(db, frase)
+
+        else:
+            if not palavra or not palavra.strip():
+                logger.warning("[SERVICE] Falha na busca: palavra-chave vazia")
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="A palavra-chave nao pode ser vazia."
+                )
+
+            logger.info(f"[SERVICE] Iniciando busca por palavra-chave: '{palavra}'")
+            resultados = DocumentoRepository.buscar_por_palavra_chave(db, palavra)
+
+        if latitude is not None and longitude is not None:
+            logger.info(f"[SERVICE] Ordenando resultados por proximidade geografica")
+
+            try:
+                resultados = sorted(
+                    resultados,
+                    key=lambda doc: calcular_distancia(
+                        latitude, longitude, doc.latitude, doc.longitude
+                    )
+                )
+            except Exception as e:
+                logger.error(f"[SERVICE] Erro ao calcular distância: {e}")
+
+        logger.info(f"[SERVICE] Busca finalizada: {len(resultados)} documento(s) retornado(s)")
+
+        return [DocumentoResponse.model_validate(doc) for doc in resultados]
