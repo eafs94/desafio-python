@@ -4,7 +4,9 @@ def test_search_by_phrase(client):
         "titulo": "Guia da Cidade",
         "autor": "Autor Y",
         "conteudo": "Informações importantes sobre a cidade.",
-        "data": "2025-01-01"
+        "data": "2025-01-01",
+        "latitude": -30.0,
+        "longitude": -51.0
     })
 
     # Busca por frase
@@ -22,7 +24,7 @@ def test_search_sorted_by_distance(client):
     client.post("/documentos", json={
         "titulo": "Doc Perto",
         "autor": "Autor 1",
-        "conteudo": "Teste de local",
+        "conteudo": "Teste distante",
         "data": "2025-01-01",
         "latitude": -30.03,
         "longitude": -51.23
@@ -40,7 +42,7 @@ def test_search_sorted_by_distance(client):
 
     # Busca que retorna ambos, com coordenadas do ponto próximo
     response = client.get(
-        "/documentos?busca=Teste&latitude=-30.03&longitude=-51.23"
+        "/documentos?busca=Teste distante&latitude=-30.03&longitude=-51.23"
     )
 
     assert response.status_code == 200

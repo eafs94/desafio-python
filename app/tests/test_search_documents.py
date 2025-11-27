@@ -4,7 +4,9 @@ def test_search_documents_found(client):
         "titulo": "Era da Informação",
         "autor": "Autor X",
         "conteudo": "Informação importante",
-        "data": "2025-01-01"
+        "data": "2025-01-01",
+        "latitude": -20.0,
+        "longitude": -40.0
     })
 
     response = client.get("/documentos?palavraChave=Informação")

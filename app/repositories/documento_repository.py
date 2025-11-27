@@ -39,7 +39,7 @@ class DocumentoRepository:
             return []
 
         logger.info(f"Executando busca no repositorio pela palavra-chave: '{palavra}'")
-        regex = rf"\b{re.escape(palavra)}\b"
+        regex = rf"\b{palavra}(s)?\b"
         stmt = select(Documento).where(
             Documento.titulo.op("REGEXP")(regex)
             | Documento.autor.op("REGEXP")(regex)

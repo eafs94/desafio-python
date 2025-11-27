@@ -23,7 +23,9 @@ def test_create_document_empty_title(client):
         "titulo": "",
         "autor": "Eric",
         "conteudo": "Texto qualquer",
-        "data": "2025-01-01"
+        "data": "2025-01-01",
+        "latitude": -30.0,
+        "longitude": -51.0
     }
 
     response = client.post("/documentos", json=payload)
