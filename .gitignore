@@ -1,0 +1,40 @@
+# Python cache
+__pycache__/
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environments
+venv/
+env/
+
+# Build & dist
+build/
+dist/
+*.egg-info/
+
+# SQLite databases
+*.db
+*.sqlite
+
+# Logs
+*.log
+
+# IDE settings
+.vscode/
+.idea/
+
+# Pytest
+.pytest_cache/
+.coverage
+htmlcov/
+
+# FastAPI / Uvicorn
+*.pid
+
+# Type-checking caches
+.mypy_cache/
+
+# Env variables
+.env
